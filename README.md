@@ -5,6 +5,7 @@ A Retrieval-Augmented Generation (RAG) application that allows you to ask questi
 ## Features
 
 - **Web Crawling**: Crawl and index any web page
+- **PDF Processing**: Upload and index PDF documents
 - **Vector Search**: Use pgvector for semantic similarity search
 - **Context-Aware Answers**: Generate answers using relevant context
 - **Streamlit Interface**: Easy-to-use web interface
@@ -52,6 +53,12 @@ The app will be available at `http://localhost:8501`
 2. Enter a URL to crawl
 3. Click "Index URL"
 
+### Upload PDF
+1. Select "Upload PDF" from the sidebar
+2. Choose a PDF file using the file uploader
+3. Review the file details
+4. Click "Process PDF" to extract and index the content
+
 ### Ask Questions
 1. Select "Ask a Question" from the sidebar
 2. Enter your question
@@ -60,4 +67,13 @@ The app will be available at `http://localhost:8501`
 ### Clear Database
 1. Select "Clear Database" from the sidebar
 2. Confirm the action to remove all indexed documents
+
+## Technical Details
+
+- **Web Crawling**: Uses Playwright via crawl4ai for JavaScript-rendered content
+- **Embeddings**: OpenAI's text-embedding-ada-002 model
+- **Vector Storage**: PostgreSQL with pgvector extension
+- **Text Generation**: OpenAI's GPT-3.5-turbo model
+- **Chunking**: Smart text splitting with token counting via tiktoken
+- **PDF Processing**: PyPDF2 for text extraction from PDF documents
 
