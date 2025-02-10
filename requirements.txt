@@ -1,0 +1,9 @@
+playwright
+crawl4ai
+openai
+asyncio
+psycopg2-binary
+pgvector
+streamlit
+python-dotenv
+tiktoken

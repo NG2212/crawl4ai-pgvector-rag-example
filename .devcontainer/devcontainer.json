@@ -1,0 +1,19 @@
+{
+  "name": "RAG App Development",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "settings": {
+
+  },
+  "extensions": [
+    "ms-python.python",
+    "ms-azuretools.vscode-docker"
+  ],
+  "forwardPorts": [
+    8501,
+    5432
+  ],
+  "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt && playwright install chromium",
+  "remoteUser": "root"
+}
