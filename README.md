@@ -20,8 +20,8 @@ A Retrieval-Augmented Generation (RAG) application that allows you to ask questi
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd <repository-name>
+   git clone [<repository-url>](https://github.com/warwickmcintosh/crawl4ai-pgvector-rag-example)
+   cd [<repository-name>](https://github.com/warwickmcintosh/crawl4ai-pgvector-rag-example)
    ```
 
 2. Create a `.env` file in the root directory:
