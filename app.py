@@ -21,6 +21,8 @@ import psycopg2
 from pgvector.psycopg2 import register_vector
 import streamlit as st
 import tiktoken
+import PyPDF2
+from io import BytesIO
 
 # Hypothetical import – adjust according to your actual crawling library.
 # For example, if you have a CrawlAI class in crawl4ai:
@@ -339,12 +341,65 @@ def clear_documents():
         raise Exception(f"Error clearing documents: {e}")
 
 
+def process_pdf(pdf_file):
+    """
+    Extract text from a PDF file and return it as a string.
+    """
+    try:
+        # Read PDF file
+        pdf_reader = PyPDF2.PdfReader(BytesIO(pdf_file.getvalue()))
+        
+        # Extract text from each page
+        text = []
+        for page in pdf_reader.pages:
+            text.append(page.extract_text())
+        
+        return "\n\n".join(text)
+    except Exception as e:
+        raise Exception(f"Error processing PDF: {e}")
+
+
+async def index_pdf_content(content: str, source_name: str):
+    """
+    Split PDF content into chunks, compute embeddings, and store in database.
+    """
+    try:
+        # Split content into chunks
+        chunks = chunk_text(content)
+        st.info(f"Split PDF into {len(chunks)} chunks")
+
+        doc_ids = []
+        for i, chunk in enumerate(chunks, 1):
+            with st.spinner(f"Processing chunk {i}/{len(chunks)}..."):
+                # Compute embedding
+                embedding = get_embedding(chunk)
+
+                # Store in PostgreSQL
+                conn = get_db_connection()
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "INSERT INTO documents (url, content, embedding) VALUES (%s, %s, %s) RETURNING id;",
+                        (f"{source_name}#chunk{i}", chunk, embedding)
+                    )
+                    doc_id = cur.fetchone()[0]
+                    conn.commit()
+                conn.close()
+                doc_ids.append(doc_id)
+
+        return doc_ids
+
+    except Exception as e:
+        st.error(f"Error during PDF indexing: {e}")
+        return None
+
+
 def main():
     st.title("RAG App using crawl4ai, pgvector and OpenAI")
     st.markdown(
         """
         This application allows you to:
         - **Index a URL:** Crawl a web page and store its content with an embedding.
+        - **Upload PDF:** Extract text from a PDF and store its content with an embedding.
         - **Ask a Question:** Retrieve relevant documents and generate an answer using context.
         - **Clear Database:** Remove all indexed documents.
         """
@@ -370,7 +425,7 @@ def main():
     # Sidebar options to switch between modes
     app_mode = st.sidebar.selectbox(
         "Choose mode", 
-        ["Index a URL", "Ask a Question", "Clear Database"]
+        ["Index a URL", "Upload PDF", "Ask a Question", "Clear Database"]
     )
 
     if app_mode == "Index a URL":
@@ -382,6 +437,36 @@ def main():
                 doc_ids = asyncio.run(crawl_and_index(url))
             if doc_ids:
                 st.success(f"Documents indexed successfully with IDs: {', '.join(map(str, doc_ids))}")
+
+    elif app_mode == "Upload PDF":
+        st.header("Upload PDF")
+        uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
+        
+        if uploaded_file is not None:
+            # Show file details
+            file_details = {
+                "Filename": uploaded_file.name,
+                "File size": f"{uploaded_file.size / 1024:.0f} KB"
+            }
+            st.write("File Details:")
+            for key, value in file_details.items():
+                st.write(f"- {key}: {value}")
+            
+            if st.button("Process PDF"):
+                try:
+                    with st.spinner("Processing PDF..."):
+                        # Extract text from PDF
+                        pdf_text = process_pdf(uploaded_file)
+                        st.info(f"Extracted {len(pdf_text)} characters from PDF")
+                        
+                        # Index the content
+                        doc_ids = asyncio.run(index_pdf_content(pdf_text, uploaded_file.name))
+                        
+                        if doc_ids:
+                            st.success(f"PDF indexed successfully with {len(doc_ids)} chunks!")
+                            
+                except Exception as e:
+                    st.error(f"Error processing PDF: {e}")
 
     elif app_mode == "Ask a Question":
         st.header("Ask a Question")
