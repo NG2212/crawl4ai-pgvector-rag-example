@@ -2,7 +2,7 @@ import asyncio
 from crawl4ai import AsyncWebCrawler
 
 async def test_crawler():
-    url = "https://docs.pydantic.dev/latest/"
+    url = "https://en.wikipedia.org/wiki/Artificial_intelligence"
     print(f"Testing crawler with URL: {url}")
     
     try:

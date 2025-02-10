@@ -15,5 +15,6 @@
     5432
   ],
   "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt && playwright install chromium",
-  "remoteUser": "root"
+  "remoteUser": "root",
+  "initializeCommand": "ln -sf ../.env .devcontainer/.env"
 }

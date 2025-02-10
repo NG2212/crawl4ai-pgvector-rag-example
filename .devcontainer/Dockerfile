@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     git \
     wget \
+    vim \
     # Playwright dependencies
     libglib2.0-0 \
     libnss3 \
@@ -30,6 +31,9 @@ RUN apt-get update && apt-get install -y \
     libcairo2 \
     libasound2 \
     && rm -rf /var/lib/apt/lists/*
+
+# Set vim as the default editor
+ENV EDITOR=vim
 
 # Set the working directory in the container
 WORKDIR /workspace
