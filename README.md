@@ -19,8 +19,12 @@ A Retrieval-Augmented Generation (RAG) application that allows you to ask questi
    * (Optional) VS Code Dev Containers / Docker Compose
  
  ## Quick Start
+1. Install dependencies:
 
-+2. Create a `.env` file in the root directory:
+   ```bash
+   pip install -r requirements.txt
+
+2. Create a `.env` file in the root directory:
  
        OPENAI_API_KEY=your_api_key_here
        OPENAI_CHAT_MODEL=gpt-5-mini
@@ -32,20 +36,48 @@ A Retrieval-Augmented Generation (RAG) application that allows you to ask questi
        DB_PASSWORD=your_password_here
  
 
-+3. Install deps & start the app:
+3. Run the app:
  
        streamlit run app.py
  
  The app will be available at `http://localhost:8501`
  
  ## Usage
-@@
- ### Ask Questions
-   1. Select "Ask a Question" from the sidebar
-   2. Enter your question
-   3. Choose Top-K, toggle **LLM re-rank** if desired, click "Get Answer"
-   4. You’ll see cosine distances for each retrieved chunk (lower = closer)
-   5. Sources are listed under the generated answer
+### Index a URL
+
+1. Choose Index a URL in the sidebar.
+
+2. Paste a URL and click Index URL.
+
+### Upload PDF
+
+1. Choose Upload PDF.
+
+2. Select a PDF, click Process PDF to extract and index.
+
+### Ask Questions
+
+1. Choose Ask a Question.
+
+2. Enter your question.
+
+3. Optionally tweak:
+
+* Top K – number of chunks to show and use.
+
+* Use LLM re-ranker – reorders the top-10 retrievals.
+
+* Show cosine distance – displays retrieval score (lower is better).
+
+* Click Get Answer. You’ll see the retrieved chunks with scores, the generated answer, and a Sources list.
+
+### Notes
+
+If you change EMBED_DIM (e.g., switch to text-embedding-3-large / 3072), recreate the table so the vector dimension matches.
+
+For larger corpora, tune the IVFFlat index lists parameter and run ANALYZE documents;.
+
+The optional paragraph-aware chunker with overlap is commented out in app.py—uncomment and use it if you want to demonstrate chunking upgrades.
  
  ## Technical Details
    * Crawling: crawl4ai (Playwright under the hood for JS pages)
